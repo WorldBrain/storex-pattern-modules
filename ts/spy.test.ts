@@ -29,17 +29,13 @@ describe('Module spy', () => {
             }
         }
 
-        interface Modules {
-            users: UserStorageModule
-        }
-        const registry = new StorageModuleRegistry<Modules>()
-        registry.register('users', new UserStorageModule({storageManager: null, operationExecuter: async ({name, context, method, render}) => {
+        const users = new UserStorageModule({storageManager: null, operationExecuter: async ({name, context, method, render}) => {
             executions.push({name, context, method, rendered: render()})
-        }}))
-        installModuleSpy(registry.modules.users)
+        }})
+        installModuleSpy(users)
 
         const executions = []
-        await registry.modules.users.registerUser({displayName: 'John Doe'})
+        await users.registerUser({displayName: 'John Doe'})
         expect(executions).toEqual([
             {name: 'createUser', context: {displayName: 'John Doe'}, method: 'registerUser', rendered: [
                 'createObject', 'user', {displayName: 'John Doe'}

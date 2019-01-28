@@ -2,7 +2,7 @@ import * as expect from 'expect'
 import { FieldType } from '@worldbrain/storex/lib/types'
 import { StorageModuleRegistry, StorageModule } from '.'
 
-describe('Module registry', () => {
+describe('StorageModule', () => {
     it('should be able to execute operations', async () => {
         class UserStorageModule extends StorageModule {
             collections = {
