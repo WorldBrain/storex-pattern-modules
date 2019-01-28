@@ -10,7 +10,7 @@ export class StorageModuleRegistry<Modules = {[name : string] : StorageModule}> 
     }
 }
 
-type StorageModuleOperationExecuter = ({name, context, render} : {name : string, context, render : () => any}) => Promise<any>
+type StorageModuleOperationExecuter = ({name, context, method, render} : {name : string, context, method : string, render : () => any}) => Promise<any>
 export class StorageModule {
     collections : {[name : string] : CollectionDefinition & {history?: Array<CollectionDefinition>}}
     operations : {[name : string] : {operation : string, collection? : string, args: {[key : string]: any}}}
@@ -22,9 +22,9 @@ export class StorageModule {
         this._operationExecuter = operationExecuter || _defaultOperationExecutor(storageManager)
     }
 
-    protected async operation(name : string, context : {[key : string] : any}) {
+    protected async operation(name : string, context : {[key : string] : any}, _method? : string) {
         if (this._operationExecuter) {
-            this._operationExecuter({name, context, render: () => {
+            this._operationExecuter({name, context, method: _method, render: () => {
                 return _renderOperation(this.operations[name], context)
             }})
         }

@@ -1,9 +1,10 @@
 import * as expect from 'expect'
 import { FieldType } from '@worldbrain/storex/lib/types'
 import { StorageModuleRegistry, StorageModule } from '.'
+import { installModuleSpy } from './spy';
 
-describe('Module registry', () => {
-    it('should be able to execute operations', async () => {
+describe('Module spy', () => {
+    it('should be able to able to tell which method an operation execute came from', async () => {
         class UserStorageModule extends StorageModule {
             collections = {
                 user: {
@@ -35,11 +36,12 @@ describe('Module registry', () => {
         registry.register('users', new UserStorageModule({storageManager: null, operationExecuter: async ({name, context, method, render}) => {
             executions.push({name, context, method, rendered: render()})
         }}))
+        installModuleSpy(registry.modules.users)
 
         const executions = []
         await registry.modules.users.registerUser({displayName: 'John Doe'})
         expect(executions).toEqual([
-            {name: 'createUser', context: {displayName: 'John Doe'}, rendered: [
+            {name: 'createUser', context: {displayName: 'John Doe'}, method: 'registerUser', rendered: [
                 'createObject', 'user', {displayName: 'John Doe'}
             ]}
         ])
