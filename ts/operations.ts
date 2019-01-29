@@ -9,6 +9,8 @@ export function renderOperationArgs(operation, vars) {
             obj[k] = renderOperationArgs(v, vars)
         }
         return obj
+    } else if (operation instanceof Array) {
+        return operation.map(elem => renderOperationArgs(elem, vars))
     } else if (typeof operation === 'string') {
         const logic = new UserLogic({definition: operation, operations: {valueTemplate: typedValueTemplate}})
         return logic.evaluate(vars)

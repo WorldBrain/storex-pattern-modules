@@ -1,6 +1,6 @@
 import * as expect from 'expect'
 import { FieldType } from '@worldbrain/storex/lib/types'
-import { StorageModuleRegistry, StorageModule } from '.'
+import { StorageModule } from '.'
 import { installModuleSpy } from './spy';
 
 describe('Module spy', () => {
