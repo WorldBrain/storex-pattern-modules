@@ -1,25 +1,29 @@
 import * as expect from 'expect'
 import { FieldType } from '@worldbrain/storex/lib/types'
-import { StorageModule } from '.'
+import { StorageModule, StorageModuleConfig } from '.'
 import { installModuleSpy } from './spy';
 
 describe('Module spy', () => {
     it('should be able to able to tell which method an operation execute came from', async () => {
         class UserStorageModule extends StorageModule {
-            collections = {
-                user: {
-                    version: new Date(2019, 1, 1),
-                    fields: {
-                        displayName: {type: 'text' as FieldType},
-                    }
-                }
-            }
-            operations = {
-                createUser: {
-                    operation: 'createObject',
-                    collection: 'user',
-                    args: {
-                        displayName: '$displayName:string'
+            getConfig() : StorageModuleConfig {
+                return {
+                    collections: {
+                        user: {
+                            version: new Date(2019, 1, 1),
+                            fields: {
+                                displayName: {type: 'text' as FieldType},
+                            }
+                        }
+                    },
+                    operations: {
+                        createUser: {
+                            operation: 'createObject',
+                            collection: 'user',
+                            args: {
+                                displayName: '$displayName:string'
+                            }
+                        }
                     }
                 }
             }

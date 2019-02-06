@@ -1,7 +1,7 @@
 {
-  "name": "@worldbrain/storex-sync",
+  "name": "@worldbrain/storex-pattern-modules",
   "version": "0.1.0",
-  "description": "Offline-first syncing between multiple databases using Storex",
+  "description": "Storex module base class",
   "main": "lib/index.js",
   "typings": "lib/index",
   "scripts": {
@@ -14,10 +14,7 @@
     "storage",
     "graph",
     "database",
-    "typescript",
-    "sync",
-    "offline-first",
-    "conflict-resolution"
+    "typescript"
   ],
   "author": "Vincent den Boer",
   "dependencies": {

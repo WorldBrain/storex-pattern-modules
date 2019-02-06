@@ -1,4 +1,4 @@
-import StorageManager from '@worldbrain/storex'
+import StorageManager, { StorageRegistry } from '@worldbrain/storex'
 import { CollectionDefinition } from '@worldbrain/storex/lib/types/collections'
 import { renderOperationArgs } from './operations';
 
@@ -10,30 +10,57 @@ export class StorageModuleRegistry<Modules = {[name : string] : StorageModule}> 
     }
 }
 
-type StorageModuleOperationExecuter = ({name, context, method, render} : {name : string, context, method : string, render : () => any}) => Promise<any>
-export class StorageModule {
-    collections : {[name : string] : CollectionDefinition & {history?: Array<CollectionDefinition>}}
-    operations : {[name : string] : {operation : string, collection? : string, args: {[key : string]: any}}}
-    // private _storageManager : StorageManager
-    private _operationExecuter? : StorageModuleOperationExecuter
+type CreateObjectDefinition = {operation: 'createObject', collection : string}
+type MiscOperationDefinition = {operation : string, collection? : string, args: {[key : string]: any}}
+export type StorageOperationDefinition = MiscOperationDefinition | CreateObjectDefinition
+export type StorageOperationDefinitions = {[name : string] : StorageOperationDefinition}
 
-    constructor({storageManager, operationExecuter} : {storageManager : StorageManager, operationExecuter? : StorageModuleOperationExecuter}) {
+type StorageOperationExecuter = ({name, context, method, render} : {name : string, context, method : string, render : () => any}) => Promise<any>
+export type StorageModuleCollections = {[name : string] : CollectionDefinition & {history?: Array<CollectionDefinition>}}
+export type StorageModuleConfig = {collections : StorageModuleCollections, operations : StorageOperationDefinitions}
+
+export abstract class StorageModule {
+    // private _storageManager : StorageManager
+    private _operationExecuter? : StorageOperationExecuter
+    collections : StorageModuleCollections
+    operations : StorageOperationDefinitions
+
+    constructor({storageManager, operationExecuter} : {storageManager : StorageManager, operationExecuter? : StorageOperationExecuter}) {
         // this._storageManager = storageManager
         this._operationExecuter = operationExecuter || _defaultOperationExecutor(storageManager)
+        Object.assign(this, this.getConfig())
+        _autoGenerateOperations(this)
     }
 
+    abstract getConfig() : StorageModuleConfig
+    
     protected async operation(name : string, context : {[key : string] : any}, _method? : string) {
         if (this._operationExecuter) {
-            this._operationExecuter({name, context, method: _method, render: () => {
+            return this._operationExecuter({name, context, method: _method, render: () => {
                 return _renderOperation(this.operations[name], context)
             }})
         }
     }
 }
 
-export function _defaultOperationExecutor(storageManager : StorageManager) {
+export function registerModuleRegistryCollections<Modules>(collectionRegistry : StorageRegistry, moduleRegistry : StorageModuleRegistry<Modules>) {
+    for (const storageModule of Object.values(moduleRegistry.modules)) {
+        registerModuleCollections(collectionRegistry, storageModule)
+    }
+}
+
+export function registerModuleCollections(collectionRegistry : StorageRegistry, storageModule : StorageModule) {
+    for (const [collectionName, collectionDefinition] of Object.entries(storageModule.collections)) {
+        collectionRegistry.registerCollection(collectionName, collectionDefinition as CollectionDefinition)
+    }
+}
+
+export function _defaultOperationExecutor(storageManager : StorageManager, debug = false) {
     return async ({render} : {render : () => any}) => {
         const [operation, ...args] = render()
+        if (debug) {
+            console.debug('DEBUG - storage backend operation:', operation, args)
+        }
         return storageManager.backend.operation(operation, ...args)
     }
 }
@@ -43,6 +70,28 @@ export function _renderOperation(operation : any, context : any) {
     if (operation.collection) {
         args.push(operation.collection)
     }
-    args.push(renderOperationArgs(operation.args, context))
+
+    const rendered = renderOperationArgs(operation.args, context)
+    if (operation.args instanceof Array) {
+        args.push(...rendered)
+    } else {
+        args.push(rendered)
+    }
     return args
+}
+
+export function _autoGenerateOperations(storageModule : StorageModule) {
+    for (const operationDefinition of Object.values(storageModule.operations)) {
+        if (operationDefinition.operation === 'createObject') {
+            let collectionDefinition = storageModule.collections[operationDefinition.collection]
+            if (collectionDefinition instanceof Array) {
+                collectionDefinition = collectionDefinition.slice(-1)[0]
+            }
+
+            const args = operationDefinition['args'] = {}
+            for (const [fieldName, fieldDefinition] of Object.entries(collectionDefinition.fields)) {
+                args[fieldName] = `$${fieldName}:${fieldDefinition.type}`
+            }
+        }
+    }
 }
