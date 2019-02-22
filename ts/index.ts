@@ -1,4 +1,4 @@
-import StorageManager, { StorageRegistry } from '@worldbrain/storex'
+import StorageManager, { StorageRegistry, isChildOfRelationship, getChildOfRelationshipTarget } from '@worldbrain/storex'
 import { CollectionDefinition } from '@worldbrain/storex/lib/types/collections'
 import { renderOperationArgs } from './operations';
 
@@ -18,21 +18,36 @@ export type StorageOperationDefinitions = {[name : string] : StorageOperationDef
 type StorageOperationExecuter = ({name, context, method, render} : {name : string, context, method : string, render : () => any}) => Promise<any>
 export type StorageModuleCollections = {[name : string] : CollectionDefinition & {history?: Array<CollectionDefinition>}}
 export type StorageModuleConfig = {collections : StorageModuleCollections, operations : StorageOperationDefinitions}
+export type StorageModuleConstructorArgs = {storageManager : StorageManager, operationExecuter? : StorageOperationExecuter}
 
 export abstract class StorageModule {
     // private _storageManager : StorageManager
     private _operationExecuter? : StorageOperationExecuter
-    collections : StorageModuleCollections
-    operations : StorageOperationDefinitions
+    private _config : StorageModuleConfig
 
-    constructor({storageManager, operationExecuter} : {storageManager : StorageManager, operationExecuter? : StorageOperationExecuter}) {
+    constructor({storageManager, operationExecuter} : StorageModuleConstructorArgs) {
         // this._storageManager = storageManager
         this._operationExecuter = operationExecuter || _defaultOperationExecutor(storageManager)
-        Object.assign(this, this.getConfig())
-        _autoGenerateOperations(this)
+    }
+
+    private _initConfig() {
+        if (!this._config) {
+            this._config = this.getConfig()
+            _autoGenerateOperations(this)
+        }
     }
 
     abstract getConfig() : StorageModuleConfig
+
+    get collections() {
+        this._initConfig()
+        return this._config.collections
+    }
+
+    get operations() {
+        this._initConfig()
+        return this._config.operations
+    }
     
     protected async operation(name : string, context : {[key : string] : any}, _method? : string) {
         if (this._operationExecuter) {
@@ -91,6 +106,12 @@ export function _autoGenerateOperations(storageModule : StorageModule) {
             const args = operationDefinition['args'] = {}
             for (const [fieldName, fieldDefinition] of Object.entries(collectionDefinition.fields)) {
                 args[fieldName] = `$${fieldName}:${fieldDefinition.type}`
+            }
+            for (const relationship of collectionDefinition.relationships || []) {
+                if (isChildOfRelationship(relationship)) {
+                    const alias = relationship.alias || getChildOfRelationshipTarget(relationship)
+                    args[alias] = `$${alias}`
+                }
             }
         }
     }
