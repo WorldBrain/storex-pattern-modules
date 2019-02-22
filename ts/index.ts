@@ -98,6 +98,10 @@ export function _renderOperation(operation : any, context : any) {
 export function _autoGenerateOperations(storageModule : StorageModule) {
     for (const operationDefinition of Object.values(storageModule.operations)) {
         if (operationDefinition.operation === 'createObject') {
+            if (operationDefinition['args']) {
+                continue
+            }
+
             let collectionDefinition = storageModule.collections[operationDefinition.collection]
             if (collectionDefinition instanceof Array) {
                 collectionDefinition = collectionDefinition.slice(-1)[0]
