@@ -15,7 +15,7 @@ type MiscOperationDefinition = {operation : string, collection? : string, args: 
 export type StorageOperationDefinition = MiscOperationDefinition | CreateObjectDefinition
 export type StorageOperationDefinitions = {[name : string] : StorageOperationDefinition}
 
-type StorageOperationExecuter = ({name, context, method, render} : {name : string, context, method : string, render : () => any}) => Promise<any>
+type StorageOperationExecuter = ({name, context, method, debug, render} : {name : string, context, method : string, debug? : boolean, render : () => any}) => Promise<any>
 export type StorageModuleCollections = {[name : string] : CollectionDefinition & {history?: Array<CollectionDefinition>}}
 export type StorageModuleConfig = {collections : StorageModuleCollections, operations : StorageOperationDefinitions}
 export type StorageModuleConstructorArgs = {storageManager : StorageManager, operationExecuter? : StorageOperationExecuter}
@@ -24,9 +24,9 @@ export abstract class StorageModule {
     // private _storageManager : StorageManager
     private _operationExecuter? : StorageOperationExecuter
     private _config : StorageModuleConfig
+    debug = false
 
     constructor({storageManager, operationExecuter} : StorageModuleConstructorArgs) {
-        // this._storageManager = storageManager
         this._operationExecuter = operationExecuter || _defaultOperationExecutor(storageManager)
     }
 
@@ -51,7 +51,7 @@ export abstract class StorageModule {
     
     protected async operation(name : string, context : {[key : string] : any}, _method? : string) {
         if (this._operationExecuter) {
-            return this._operationExecuter({name, context, method: _method, render: () => {
+            return this._operationExecuter({name, context, debug: this.debug, method: _method, render: () => {
                 return _renderOperation(this.operations[name], context)
             }})
         }
@@ -70,8 +70,8 @@ export function registerModuleCollections(collectionRegistry : StorageRegistry, 
     }
 }
 
-export function _defaultOperationExecutor(storageManager : StorageManager, debug = false) {
-    return async ({render} : {render : () => any}) => {
+export function _defaultOperationExecutor(storageManager : StorageManager) {
+    return async ({render, debug} : {render : () => any, debug? : boolean}) => {
         const [operation, ...args] = render()
         if (debug) {
             console.debug('DEBUG - storage backend operation:', operation, args)

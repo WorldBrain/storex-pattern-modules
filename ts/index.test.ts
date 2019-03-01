@@ -36,7 +36,7 @@ class TestUserStorageModule extends StorageModule {
     }
 
     async updateDisplayNameById(id : any, displayName : string) {
-        await this.operation('updateDisplayNameById', {id, displayName})
+        return await this.operation('updateDisplayNameById', {id, displayName})
     }
 }
 
