@@ -68,23 +68,23 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.12.18.tgz#1d3ca764718915584fcd9f6344621b7672665c67"
   integrity sha512-fh+pAqt4xRzPfqA6eh3Z2y6fyZavRIumvjhaCL753+TVkGKGhpPeyrJG2JftD0T9q4GF00KjefsQ+PQNDdWQaQ==
 
-"@worldbrain/storex-backend-dexie@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@worldbrain/storex-backend-dexie/-/storex-backend-dexie-0.1.0.tgz#15bf9179b976b345cbad944c4e4d5f3064b24bb5"
-  integrity sha512-K3i3/6Bn2fdhmqS2qlKM3sv0+PRNXoHDsF6GazhAjd/wM00LqSW2oOoTwkZY0FCww5ODw8abVpBLHb1mrVU+pA==
+"@worldbrain/storex-backend-dexie@^0.2.2":
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/@worldbrain/storex-backend-dexie/-/storex-backend-dexie-0.2.2.tgz#8a4a47b20db5f9aad8577bbb94652b893f65d263"
+  integrity sha512-MdYW79jV9MWOlwT8fNbwROV6TflsZkBRVPZHgUjgcFpVxCmghYFcZxa7fTIIugHYxtsnW7mWViyceQtIp6s+8A==
   dependencies:
-    "@worldbrain/storex" "^0.1.1"
+    "@worldbrain/storex" "^0.3.3"
     dexie "^2.0.4"
     dexie-mongoify "^1.3.0"
 
-"@worldbrain/storex@^0.1.1":
-  version "0.1.4"
-  resolved "https://registry.yarnpkg.com/@worldbrain/storex/-/storex-0.1.4.tgz#d8ec81f3d78f5ca2c464b5b07516d71b43b256ca"
-  integrity sha512-NLxGQ52hc8KkaJZkHMbhK+JiWg6sqsAVeotyxFp0lNaJirSNKIps6IO6jyA01q065VEgiTSFC4T0nQcNS7h5vw==
+"@worldbrain/storex@^0.3.3":
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/@worldbrain/storex/-/storex-0.3.3.tgz#bcbc6cb21a364bc63168c6ab4bff0b68343348a9"
+  integrity sha512-pz831CRCIab7AqRYOuKH35S3l2u/yTF3q1giLKIET7AijIoWp1LGgdJKhS2riRbZkwLgrpIX/Ah5h9S564rClg==
   dependencies:
     event-emitter "^0.3.5"
     events "^3.0.0"
-    lodash "^4.17.10"
+    lodash "^4.17.11"
     pluralize "^7.0.0"
     randombytes "^2.0.6"
     source-map-support "^0.4.18"

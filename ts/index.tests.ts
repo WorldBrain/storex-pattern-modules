@@ -6,9 +6,10 @@ import { StorageModule, registerModuleCollections } from ".";
 
 export async function setupStorexTest<T extends {[name : string] : StorageModule}>(options : {
     collections : RegistryCollections,
-    modules : {[name : string] : (options : {storageManager : StorageManager}) => StorageModule}
+    modules : {[name : string] : (options : {storageManager : StorageManager}) => StorageModule},
+    dbName? : string
 }) {
-    const backend = new DexieStorageBackend({idbImplementation: inMemory(), dbName: 'unittest'})
+    const backend = new DexieStorageBackend({idbImplementation: inMemory(), dbName: options.dbName || 'unittest'})
     const storageManager = new StorageManager({backend: backend as any})
     storageManager.registry.registerCollections(options.collections)
 
