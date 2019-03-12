@@ -1,6 +1,7 @@
 import StorageManager, { StorageRegistry, isChildOfRelationship, getChildOfRelationshipTarget } from '@worldbrain/storex'
 import { CollectionDefinition } from '@worldbrain/storex/lib/types/collections'
 import { renderOperationArgs } from './operations';
+import { StorageOperationExecuter, StorageModuleConfig, StorageModuleConstructorArgs } from './types';
 
 export class StorageModuleRegistry<Modules = {[name : string] : StorageModule}> {
     modules : Modules = {} as any
@@ -9,16 +10,6 @@ export class StorageModuleRegistry<Modules = {[name : string] : StorageModule}> 
         this.modules[name as string] = module
     }
 }
-
-type CreateObjectDefinition = {operation: 'createObject', collection : string}
-type MiscOperationDefinition = {operation : string, collection? : string, args: {[key : string]: any}}
-export type StorageOperationDefinition = MiscOperationDefinition | CreateObjectDefinition
-export type StorageOperationDefinitions = {[name : string] : StorageOperationDefinition}
-
-type StorageOperationExecuter = ({name, context, method, debug, render} : {name : string, context, method : string, debug? : boolean, render : () => any}) => Promise<any>
-export type StorageModuleCollections = {[name : string] : CollectionDefinition & {history?: Array<CollectionDefinition>}}
-export type StorageModuleConfig = {collections : StorageModuleCollections, operations : StorageOperationDefinitions}
-export type StorageModuleConstructorArgs = {storageManager : StorageManager, operationExecuter? : StorageOperationExecuter}
 
 export abstract class StorageModule {
     // private _storageManager : StorageManager
