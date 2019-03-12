@@ -2,6 +2,7 @@ import StorageManager, { StorageRegistry, isChildOfRelationship, getChildOfRelat
 import { CollectionDefinition } from '@worldbrain/storex/lib/types/collections'
 import { renderOperationArgs } from './operations';
 import { StorageOperationExecuter, StorageModuleConfig, StorageModuleConstructorArgs } from './types';
+export * from './types'
 
 export class StorageModuleRegistry<Modules = {[name : string] : StorageModule}> {
     modules : Modules = {} as any
