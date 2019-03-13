@@ -1,7 +1,8 @@
 import * as expect from 'expect'
 import { FieldType } from '@worldbrain/storex/lib/types'
-import { StorageModuleRegistry, StorageModule, registerModuleRegistryCollections, registerModuleCollections, StorageModuleConfig } from '.'
+import { StorageModuleRegistry, StorageModule, registerModuleRegistryCollections, registerModuleCollections } from '.'
 import StorageManager from '@worldbrain/storex';
+import { StorageModuleConfig } from './types';
 
 class TestUserStorageModule extends StorageModule {
     getConfig() : StorageModuleConfig {

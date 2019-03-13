@@ -1,7 +1,8 @@
 import * as expect from 'expect'
 import { FieldType } from '@worldbrain/storex/lib/types'
-import { StorageModule, StorageModuleConfig } from '.'
+import { StorageModule } from '.'
 import { installModuleSpy } from './spy';
+import { StorageModuleConfig } from './types';
 
 describe('Module spy', () => {
     it('should be able to able to tell which method an operation execute came from', async () => {
