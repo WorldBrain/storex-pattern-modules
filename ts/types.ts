@@ -14,7 +14,7 @@ export type PublicMethodDefinitions = {[name : string] : PublicMethodDefinition}
 export interface PublicMethodDefinition {
     type : 'query' | 'mutation'
     args : PublicMethodArgs
-    returns : PublicMethodValueType
+    returns : PublicMethodValueType | 'void'
 }
 
 export type PublicMethodArgs = {[name : string] : PublicMethodArg}
