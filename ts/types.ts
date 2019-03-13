@@ -21,17 +21,21 @@ export type PublicMethodArgs = {[name : string] : PublicMethodArg}
 export type PublicMethodArg = PublicMethodValue<PublicMethodDetailedArg>
 export type PublicMethodDetailedArg = PublicMethodDetailedValue & {positional? : true}
 
-export type PublicMethodValue<Detailed = PublicMethodDetailedValue> = PublicMethodValueType | Detailed
-export type PublicMethodDetailedValue = { type : PublicMethodValueType, optional? : boolean }
+export type PublicMethodValues = {[key : string] : PublicMethodValue}
+export type PublicMethodValue<Detailed = PublicMethodDetailedValue, ValueType = PublicMethodValueType> = ValueType | Detailed
+export type PublicMethodDetailedValue<ValueType = PublicMethodValueType> = { type : ValueType, optional? : boolean }
 export const isDetailedPublicMethodValue = (arg : PublicMethodValue) : arg is PublicMethodDetailedValue => !!arg['type']
 export const ensureDetailedPublicMethodValue = (arg : PublicMethodValue) : PublicMethodDetailedValue =>
     isDetailedPublicMethodValue(arg) ? arg : { type: arg }
 
-export type PublicMethodValueType = PublicMethodScalarType | PublicMethodCollectionType | PublicMethodArrayType
+export type PublicMethodValueType = PublicMethodScalarType | PublicMethodCollectionType | PublicMethodArrayType | PublicMethodObjectType
 export type PublicMethodScalarType = PrimitiveFieldType
 export type PublicMethodArrayType = { array: PublicMethodValueType }
 export const isPublicMethodArrayType = (valueType : PublicMethodValueType) : valueType is PublicMethodArrayType =>
     !!valueType['array']
+export type PublicMethodObjectType = { object: PublicMethodValues }
+export const isPublicMethodObjectType = (valueType : PublicMethodValueType) : valueType is PublicMethodObjectType =>
+    !!valueType['object']
 export type PublicMethodCollectionType = { collection : string }
 export const isPublicMethodCollectionType = (valueType : PublicMethodValueType) : valueType is PublicMethodCollectionType =>
     !!valueType['collection']
