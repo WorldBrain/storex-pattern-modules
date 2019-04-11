@@ -5,10 +5,15 @@ export type MiscOperationDefinition = {operation : string, collection? : string,
 export type StorageOperationDefinition = MiscOperationDefinition | CreateObjectDefinition
 export type StorageOperationDefinitions = {[name : string] : StorageOperationDefinition}
 
-export type StorageOperationExecuter = ({name, context, method, debug, render} : {name : string, context, method : string, debug? : boolean, render : () => any}) => Promise<any>
+export type StorageOperationExecuter = ({name, context, method, debug, render} : {name : string, context, method : string, debug? : boolean | StorageModuleDebugConfig, render : () => any}) => Promise<any>
 export type StorageModuleCollections = {[name : string] : CollectionDefinition & {history?: Array<CollectionDefinition>}}
 export type StorageModuleConfig = {collections? : StorageModuleCollections, operations? : StorageOperationDefinitions, methods? : PublicMethodDefinitions}
 export type StorageModuleConstructorArgs = {storageManager : StorageManager, operationExecuter? : StorageOperationExecuter}
+export interface StorageModuleDebugConfig {
+    includeReturnValues? : boolean
+    onlyModuleOperations? : string[]
+    printDeepObjects? : boolean
+}
 
 export type PublicMethodDefinitions = {[name : string] : PublicMethodDefinition}
 export interface PublicMethodDefinition {
@@ -33,7 +38,7 @@ export type PublicMethodScalarType = PrimitiveFieldType
 export type PublicMethodArrayType = { array: PublicMethodValueType }
 export const isPublicMethodArrayType = (valueType : PublicMethodValueType) : valueType is PublicMethodArrayType =>
     !!valueType['array']
-export type PublicMethodObjectType = { object: PublicMethodValues }
+export type PublicMethodObjectType = { object: PublicMethodValues, singular : string }
 export const isPublicMethodObjectType = (valueType : PublicMethodValueType) : valueType is PublicMethodObjectType =>
     !!valueType['object']
 export type PublicMethodCollectionType = { collection : string }
