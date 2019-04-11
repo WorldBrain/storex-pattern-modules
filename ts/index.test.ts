@@ -1,6 +1,6 @@
 import * as expect from 'expect'
 import { FieldType } from '@worldbrain/storex/lib/types'
-import { StorageModuleRegistry, StorageModule, registerModuleRegistryCollections, registerModuleCollections } from '.'
+import { StorageModule, registerModuleCollections, registerModuleMapCollections } from '.'
 import StorageManager from '@worldbrain/storex';
 import { StorageModuleConfig } from './types';
 
@@ -47,15 +47,13 @@ interface TestModules {
 
 describe('StorageModule', () => {
     it('should be able to execute operations', async () => {
-        const registry = new StorageModuleRegistry<TestModules>()
-
         const executions = []
-        registry.register('users', new TestUserStorageModule({storageManager: null, operationExecuter: async ({name, context, method, render}) => {
+        const users = new TestUserStorageModule({storageManager: null, operationExecuter: async ({name, context, method, render}) => {
             executions.push({name, context, method, rendered: render()})
             return 'bla'
-        }}))
+        }})
 
-        expect(await registry.modules.users.updateDisplayNameById(1, 'John Doe')).toEqual('bla')
+        expect(await users.updateDisplayNameById(1, 'John Doe')).toEqual('bla')
         expect(executions).toEqual([
             {name: 'updateDisplayNameById', context: {id: 1, displayName: 'John Doe'}, rendered: [
                 'updateObject', 'user', {id: 1}, {displayName: 'John Doe'}
@@ -64,14 +62,12 @@ describe('StorageModule', () => {
     })
 
     it('should be able to automatically generate createObject operations', async () => {
-        const registry = new StorageModuleRegistry<TestModules>()
-
         const executions = []
-        registry.register('users', new TestUserStorageModule({storageManager: null, operationExecuter: async ({name, context, method, render}) => {
+        const users = new TestUserStorageModule({storageManager: null, operationExecuter: async ({name, context, method, render}) => {
             executions.push({name, context, method, rendered: render()})
-        }}))
+        }})
 
-        await registry.modules.users.registerUser({displayName: 'John Doe'})
+        await users.registerUser({displayName: 'John Doe'})
         expect(executions).toEqual([
             {name: 'createUser', context: {displayName: 'John Doe'}, rendered: [
                 'createObject', 'user', {displayName: 'John Doe'}
@@ -81,13 +77,12 @@ describe('StorageModule', () => {
 })
 
 describe('Storage module helper functions', () => {
-    it('should be able to register all collections in a module registry', async () => {
-        const storageManager = new StorageManager({backend: {
+    it('should be able to register all collections in a module map', async () => {
+        const storageManager = new StorageManager({ backend: {
             configure: () => null,
-        } as any})
-        const moduleRegistry = new StorageModuleRegistry<TestModules>()
-        moduleRegistry.register('users', new TestUserStorageModule({storageManager}))
-        registerModuleRegistryCollections(storageManager.registry, moduleRegistry)
+        } as any })
+        const modules = { users: new TestUserStorageModule({ storageManager }) }
+        registerModuleMapCollections(storageManager.registry, modules)
         await storageManager.finishInitialization()
 
         expect(storageManager.registry.getCollectionsByVersion(new Date(2019, 1, 1))).toEqual(expect.objectContaining({

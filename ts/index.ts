@@ -4,14 +4,6 @@ import { renderOperationArgs } from './operations';
 import { StorageOperationExecuter, StorageModuleConfig, StorageModuleConstructorArgs, StorageModuleDebugConfig } from './types';
 export * from './types'
 
-export class StorageModuleRegistry<Modules = {[name : string] : StorageModule}> {
-    modules : Modules = {} as any
-
-    register<Module>(name : keyof Modules, module : Module) {
-        this.modules[name as string] = module
-    }
-}
-
 export interface StorageModuleInterface {
     getConfig() : StorageModuleConfig
 }
@@ -52,10 +44,6 @@ export abstract class StorageModule implements StorageModuleInterface {
             }})
         }
     }
-}
-
-export function registerModuleRegistryCollections(collectionRegistry : StorageRegistry, moduleRegistry : StorageModuleRegistry<any>) {
-    registerModuleMapCollections(collectionRegistry, moduleRegistry.modules)
 }
 
 export function registerModuleMapCollections(
