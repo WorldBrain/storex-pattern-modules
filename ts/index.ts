@@ -6,7 +6,7 @@ import {
     StorageModuleDebugConfig, 
     StorageOperationExecuter, 
     StorageModuleConfig, 
-    ModuleHistory,
+    StorageModuleHistory,
 } from './types';
 
 export * from './types'
@@ -162,7 +162,7 @@ export function _autoGenerateOperations(storageModule : StorageModule) {
     }
 }
 
-export function withHistory(moduleConfig : StorageModuleConfig & { history : ModuleHistory }) : StorageModuleConfig {
+export function withHistory(moduleConfig : StorageModuleConfig & { history : StorageModuleHistory }) : StorageModuleConfig {
     for (const [collectionName, collectionHistory] of Object.entries(moduleConfig.history.collections)) {
         if (!moduleConfig.collections) {
             continue
