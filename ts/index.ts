@@ -1,7 +1,14 @@
 import StorageManager, { StorageRegistry, isChildOfRelationship, getChildOfRelationshipTarget } from '@worldbrain/storex'
 import { CollectionDefinition } from '@worldbrain/storex/lib/types/collections'
 import { renderOperationArgs } from './operations';
-import { StorageOperationExecuter, StorageModuleConfig, StorageModuleConstructorArgs, StorageModuleDebugConfig } from './types';
+import { 
+    StorageModuleConstructorArgs, 
+    StorageModuleDebugConfig, 
+    StorageOperationExecuter, 
+    StorageModuleConfig, 
+    ModuleHistory,
+} from './types';
+
 export * from './types'
 
 export interface StorageModuleInterface {
@@ -153,4 +160,15 @@ export function _autoGenerateOperations(storageModule : StorageModule) {
             }
         }
     }
+}
+
+export function withHistory(moduleConfig : StorageModuleConfig & { history : ModuleHistory }) : StorageModuleConfig {
+    for (const [collectionName, collectionHistory] of Object.entries(moduleConfig.history.collections)) {
+        if (!moduleConfig.collections) {
+            continue
+        }
+
+        moduleConfig.collections[collectionName].history = collectionHistory
+    }
+    return moduleConfig
 }
