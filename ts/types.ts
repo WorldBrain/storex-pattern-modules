@@ -44,3 +44,7 @@ export const isPublicMethodObjectType = (valueType : PublicMethodValueType) : va
 export type PublicMethodCollectionType = { collection : string }
 export const isPublicMethodCollectionType = (valueType : PublicMethodValueType) : valueType is PublicMethodCollectionType =>
     !!valueType['collection']
+
+export interface ModuleHistory {
+    collections : {[name : string] : Array<CollectionDefinition>}
+}
