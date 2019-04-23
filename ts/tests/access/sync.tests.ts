@@ -32,11 +32,12 @@ export class SharedSyncLogStorage extends StorageModule implements SharedSyncLog
                 sharedSyncLogSeenEntry: {
                     version: new Date('2019-02-05'),
                     fields: {
+                        creatorId: { type: this.autoPkType },
                         creatorDeviceId: { type: this.autoPkType },
                         retrieverDeviceId: { type: this.autoPkType },
                         createdOn: { type: 'timestamp' },
                     },
-                    indices: [ { field: ['retrieverDeviceId', 'createdOn'] } ]
+                    groupBy: [{ key: 'creatorDeviceId', subcollectionName: 'entries' }],
                 }
             },
             operations: {
@@ -90,13 +91,7 @@ export class SharedSyncLogStorage extends StorageModule implements SharedSyncLog
                         access: ['read', 'create', 'delete'],
                     },
                     sharedSyncLogSeenEntry: {
-                        prepare: [
-                            {
-                                placeholder: 'deviceInfo', operation: 'findObject', collection: 'sharedSyncLogDeviceInfo',
-                                where: { userId: '$context.user.id' }
-                            }
-                        ],
-                        field: 'deviceInfo.userId',
+                        field: 'userId',
                         access: ['read', 'create', 'delete'],
                     },
                 },
@@ -104,7 +99,7 @@ export class SharedSyncLogStorage extends StorageModule implements SharedSyncLog
                     sharedSyncLogDeviceInfo: [
                         { field: 'sharedUntil', rule: { or: [
                             { and: [{ exists: '$oldValue' }, { eq: ['$value', '$context.now'] }] },
-                            { and: [{ not: { exists: '$oldValue' }, eq: ['$value', null] }] },
+                            { and: [{ not: { exists: '$oldValue' } }, { eq: ['$value', null] }] },
                         ] } }
                     ]
                 },
@@ -112,11 +107,11 @@ export class SharedSyncLogStorage extends StorageModule implements SharedSyncLog
                     {
                         prepare: [
                             {
-                                placeholder: 'userDeviceCount', operation: 'countObjects', collection: 'sharedSyncLogDeviceInfo',
+                                placeholder: 'deviceCount', operation: 'countObjects', collection: 'sharedSyncLogDeviceInfo',
                                 where: { userId: '$context.user.id' }
                             },
                         ],
-                        rule: { lt: ['$devices.length', 5] }
+                        rule: { lt: ['$deviceCount', 5] }
                     }
                 ]
             }
@@ -144,7 +139,7 @@ export class SharedSyncLogStorage extends StorageModule implements SharedSyncLog
         return unseenEntries
     }
 
-    async markAsSeen(entries : Array<{ deviceId, createdOn : number }>, options : { deviceId }) : Promise<void> {
+    async markAsSeen(entries : Array<{ deviceId, createdOn : number }>, options : { creatorId, deviceId, now : number }) : Promise<void> {
         if (!entries.length) {
             return
         }
@@ -154,8 +149,10 @@ export class SharedSyncLogStorage extends StorageModule implements SharedSyncLog
             operation: 'createObject',
             collection: 'sharedSyncLogSeenEntry',
             args: {
+                creatorId: options.creatorId,
                 creatorDeviceId: entry.deviceId,
-                createdOn: entry.createdOn,
+                createdOn: options.now,
+                entryCreatedOn: entry.createdOn,
                 retrieverDeviceId: options.deviceId,
             }
         }))})
