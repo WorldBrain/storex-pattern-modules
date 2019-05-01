@@ -1,19 +1,4 @@
-import StorageManager, { PrimitiveFieldType, CollectionDefinition } from "@worldbrain/storex";
-
-export type CreateObjectDefinition = {operation: 'createObject', collection : string}
-export type MiscOperationDefinition = {operation : string, collection? : string, args: {[key : string]: any}}
-export type StorageOperationDefinition = MiscOperationDefinition | CreateObjectDefinition
-export type StorageOperationDefinitions = {[name : string] : StorageOperationDefinition}
-
-export type StorageOperationExecuter = ({name, context, method, debug, render} : {name : string, context, method : string, debug? : boolean | StorageModuleDebugConfig, render : () => any}) => Promise<any>
-export type StorageModuleCollections = {[name : string] : CollectionDefinition & {history?: Array<CollectionDefinition>}}
-export type StorageModuleConfig = {collections? : StorageModuleCollections, operations? : StorageOperationDefinitions, methods? : PublicMethodDefinitions}
-export type StorageModuleConstructorArgs = {storageManager : StorageManager, operationExecuter? : StorageOperationExecuter}
-export interface StorageModuleDebugConfig {
-    includeReturnValues? : boolean
-    onlyModuleOperations? : string[]
-    printDeepObjects? : boolean
-}
+import { PrimitiveFieldType } from "@worldbrain/storex";
 
 export type PublicMethodDefinitions = {[name : string] : PublicMethodDefinition}
 export interface PublicMethodDefinition {

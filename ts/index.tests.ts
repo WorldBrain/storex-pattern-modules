@@ -1,17 +1,20 @@
-import StorageManager from "@worldbrain/storex"
+import StorageManager, { StorageBackend } from "@worldbrain/storex"
 import { RegistryCollections } from "@worldbrain/storex/lib/registry"
 import { DexieStorageBackend } from "@worldbrain/storex-backend-dexie"
 import inMemory from "@worldbrain/storex-backend-dexie/lib/in-memory"
 import { StorageModule, registerModuleCollections } from ".";
 
 export async function setupStorexTest<T extends {[name : string] : StorageModule}>(options : {
-    collections : RegistryCollections,
     modules : {[name : string] : (options : {storageManager : StorageManager}) => StorageModule},
-    dbName? : string
+    collections? : RegistryCollections,
+    dbName? : string,
+    backend? : StorageBackend
 }) {
-    const backend = new DexieStorageBackend({idbImplementation: inMemory(), dbName: options.dbName || 'unittest'})
+    const backend = options.backend || new DexieStorageBackend({idbImplementation: inMemory(), dbName: options.dbName || 'unittest'})
     const storageManager = new StorageManager({backend: backend as any})
-    storageManager.registry.registerCollections(options.collections)
+    if (options.collections) {
+        storageManager.registry.registerCollections(options.collections)
+    }
 
     const modules : {[name : string] : StorageModule} = {}
     for (const [name, moduleCreator] of Object.entries(options.modules)) {
