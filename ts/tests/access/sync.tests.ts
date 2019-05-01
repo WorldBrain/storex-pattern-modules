@@ -103,17 +103,6 @@ export class SharedSyncLogStorage extends StorageModule implements SharedSyncLog
                         ] } }
                     ]
                 },
-                constraints: [
-                    {
-                        prepare: [
-                            {
-                                placeholder: 'deviceCount', operation: 'countObjects', collection: 'sharedSyncLogDeviceInfo',
-                                where: { userId: '$context.user.id' }
-                            },
-                        ],
-                        rule: { lt: ['$deviceCount', 5] }
-                    }
-                ]
             }
         })
 
