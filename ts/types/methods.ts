@@ -1,4 +1,4 @@
-import { PrimitiveFieldType } from "@worldbrain/storex";
+import { PrimitiveFieldType, CollectionDefinition } from "@worldbrain/storex";
 
 export type PublicMethodDefinitions = {[name : string] : PublicMethodDefinition}
 export interface PublicMethodDefinition {
