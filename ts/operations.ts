@@ -1,6 +1,7 @@
-import * as isPlainObject from 'lodash/isPlainObject'
 import { UserLogic } from 'user-logic'
 import { typedValueTemplate } from './user-logic'
+
+const isPlainObject = require('lodash/isPlainObject')
 
 export function renderOperationArgs(operation, vars) {
     if (isPlainObject(operation)) {
