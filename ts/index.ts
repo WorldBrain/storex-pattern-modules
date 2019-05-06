@@ -1,5 +1,4 @@
 import StorageManager, { StorageRegistry, isChildOfRelationship, getChildOfRelationshipTarget } from '@worldbrain/storex'
-import { CollectionDefinition } from '@worldbrain/storex/lib/types/collections'
 import { renderOperationArgs } from './operations';
 import { 
     StorageModuleConstructorArgs, 

@@ -51,7 +51,7 @@ export interface CountObjectsPermissionPreparation extends BasePermissionPrepara
 export type RuleLogic = RuleLogicValue | RuleLogicBinaryOp | RuleLogicExists | RuleLogicNot
 export interface RuleLogicArray extends Array<RuleLogic> {}
 export type RuleLogicValue = string | number | boolean | null
-export type RuleLogicBinaryOpKey = 'or' | 'and' | 'eq' | 'ne' | 'gt' | 'ge' | 'lt' | 'le'
+export type RuleLogicBinaryOpKey = 'or' | 'and' | 'eq' | 'ne' | 'gt' | 'ge' | 'lt' | 'le' | 'has'
 export type RuleLogicBinaryOp = { [OpKey in RuleLogicBinaryOpKey]? : RuleLogicArray}
 export type RuleLogicExists = { exists : string }
 export type RuleLogicNot = { not : RuleLogic }
