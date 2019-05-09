@@ -91,7 +91,11 @@ export class TodoListStorage extends StorageModule {
             },
             operations: {
                 updateListTitle: {
+                    // `operation` can be any operation passed in as the
+                    // first arg to `storageManager.operation(<operation>)`,
+                    // including one provided by middleware or a backend plugin
                     operation: 'updateObject',
+                    
                     collection: 'todoList',
                     args: [  // These are the arguments in `storageManager.operation(collection, ...<args>)`
                         { id: '$id:pk' } // where clause,
