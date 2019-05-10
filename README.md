@@ -1,16 +1,16 @@
 This module provides a base class and types for organizing storage logic based on [Storex](https://github.com/WorldBrain/storex) into modules. Each module:
 
-* Defines and exposes some higher-level methods to work with your data (createUser, findPostsWithTags, etc.)
-* Defines collections collections and their changes over time
-* Defines the lower-level operations it uses to implement its higher-level methods
-* Defines access rules for reading and manipulating data in a multi-user application (either cloud-based or decentralized)
+* Defines and exposes some higher-level methods to work with your data (`createUser`, `findPostsWithTags`, etc.).
+* Defines collections and their changes over time.
+* Defines the lower-level operations it uses to implement its higher-level methods.
+* Defines access rules for reading and manipulating data in a multi-user application (either cloud-based or decentralized).
 
 This means you have extra metadata about your storage layer you can use to:
 
 * Automatically generate web APIs with the same interface, allowing you to seamlessly move your storage logic between front- and back-end, as is for example done with the GraphQL [schema](https://github.com/WorldBrain/storex-graphql-schema/) and [client](https://github.com/WorldBrain/storex-graphql-client).
-* Automatically give hints on where to places indices
-* Generate graphs on which parts of your software perform what operations of your database
-* Compile access rules to more specific systems that'd otherwise lock you in, like Firebase/Firestore
+* Automatically give hints on where to place indices.
+* Generate graphs on which parts of your software perform what operations of your database.
+* Compile access rules to more specific systems that'd otherwise lock you in, like Firebase/Firestore.
 * Once we design different ways of specifying methods (in the future), this could even compile to Ethereum smart contracts to enable a massively improved workflow.
 
 Basic usage
@@ -18,8 +18,7 @@ Basic usage
 
 A `StorageModule` is nothing more than a class accepting a storage manager, exposing a config, and some protected methods:
 
-```
-
+```ts
 import { StorageModule, StorageModuleConfig, StorageModuleConstructorArgs } from '@worldbrain/storex-pattern-modules'
 
 export class TodoListStorage extends StorageModule {
@@ -36,7 +35,7 @@ export class TodoListStorage extends StorageModule {
         }
     }
     
-    async createList(list : { label: string, items: Array<{label : string, done : boolean}> }) { // It's just a normal class, do whatever you want its methods
+    async createList(list : { label: string, items: Array<{label : string, done : boolean}> }) { // It's just a normal class, do whatever you want to its methods
     
     }
 }
@@ -47,7 +46,7 @@ Defining collections
 
 The `collections` field of the `StorageModuleConfig` is an object containing [collection definitions](https://github.com/WorldBrain/storex/blob/master/docs/collections.md):
 
-```
+```ts
 export class TodoListStorage extends StorageModule {
     getConfig() : StorageModuleConfig {
         return {
@@ -64,7 +63,7 @@ export class TodoListStorage extends StorageModule {
 }
 ```
 
-Each collection can contain a `history` propery containing previous versions of the collection. This can be used as long as you need information about these old versions in your applications (for example, to enable data migrations of old exported data.)
+Each collection can contain a `history` property containing previous versions of the collection. This can be used as long as you need information about these old versions in your applications (for example, to enable data migrations of old exported data).
 
 
 Defining and executing operations
@@ -72,10 +71,10 @@ Defining and executing operations
 
 The `operations` field of the `StorageModuleConfig` contains templates of the operations this module will execute. These templates contain placeholders that will be filled in once operation is executed.
 
-This example build on the one above, so `collections` is omitted here for sake of brevity:
+This example builds on the one above, so `collections` is omitted here for sake of brevity:
 
 
-```
+```ts
 export class TodoListStorage extends StorageModule {
     debug = true // You can optionally set this to true to see all the operations logged that your module is executing
 
@@ -138,17 +137,17 @@ export class TodoListStorage extends StorageModule {
 }
 ```
 
-The `args` property of an operation template can contain `$placeholder:type` strings anywhere, to be later merged in when `this.operation()` is called. The type is supposed to be one of the same types you use in field collection definition, in order to optionally provide some run-time type checking. However, this is not implemented yet.
+The `args` property of an operation template can contain `$placeholder:type` strings anywhere. The `$placeholder` part will be later substituted by the corresponding property of the second argument given when `this.operation()` is called. The `type` is supposed to be one of the same types you use in field collection definition, in order to optionally provide some run-time type checking. However, this is not implemented yet.
 
 
 Defining methods
 ================
 
-As long as you're using you're methods in the same application, you can call methods directly. However, once your business and storage logic start to live in separate places (like mobile clients and servers) you want to introduce some extra info on expected input and output to perform more validation (which is automatically done if you're using the GraphQL schema.)
+As long as you're using your methods in the same application, you can call methods directly. However, once your business and storage logic start to live in separate places (like mobile clients and servers) you want to introduce some extra info on expected input and output to perform more validation (which is automatically done if you're using the GraphQL schema).
 
-This example build on the one above, so `collections` and `operations` are omitted here for sake of brevity:
+This example builds on the one above, so `collections` and `operations` are omitted here for sake of brevity:
 
-```
+```ts
 export class TodoListStorage extends StorageModule {
     getConfig() : StorageModuleConfig { // This is the important part defining things other tools can use
         return {
