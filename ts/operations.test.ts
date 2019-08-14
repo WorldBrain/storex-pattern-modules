@@ -1,4 +1,4 @@
-import * as expect from 'expect'
+import expect from 'expect'
 import { renderOperationArgs } from './operations';
 
 describe('Predefined operations', () => {
