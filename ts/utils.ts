@@ -1,7 +1,7 @@
 import fromPairs from 'lodash/fromPairs'
 import mapValues from 'lodash/mapValues'
 import { CollectionDefinition } from '@worldbrain/storex'
-import { StorageModuleCollections } from '@worldbrain/storex-pattern-modules'
+import { StorageModuleCollections } from './'
 
 export interface CollectionVersionMapEntry {
     moduleVersion: Date
@@ -24,20 +24,27 @@ export function mapCollectionVersions(options: {
         (prev, curr) => Math.min(prev, curr.moduleVersion.getTime()),
         new Date('2100-01-01').getTime(),
     )
+    const minimalApplicationVersion = applicationVersions[minimalModuleVersion].applicationVersion
+
     const collectionVersionTimestamp = (
         collectionDefinition: CollectionDefinition,
     ) => collectionDefinition.version.getTime()
     const mapCollectionVersion = (
+        collectionName: string,
         collectionDefinition: CollectionDefinition,
         versionTimestamp: number,
+        options: { optional: boolean }
     ) => {
         const mapping = applicationVersions[versionTimestamp]
         if (!mapping) {
+            if (options.optional) {
+                return null
+            }
             throw new Error(
-                `Could not map following collection version ` +
-                    collectionDefinition.name! +
-                    ` to application version: ` +
-                    collectionDefinition.version.toISOString(),
+                `Could not map collection version of collection ` +
+                collectionName +
+                ` to application version: ` +
+                collectionDefinition.version.toISOString(),
             )
         }
 
@@ -49,7 +56,7 @@ export function mapCollectionVersions(options: {
 
     return mapValues(
         options.collectionDefinitions,
-        latestCollectionDefinition => {
+        (latestCollectionDefinition, collectionName) => {
             const oldHistory = latestCollectionDefinition.history || []
             const history = oldHistory
                 .map(
@@ -64,8 +71,10 @@ export function mapCollectionVersions(options: {
                         }
 
                         return mapCollectionVersion(
+                            collectionName,
                             pastCollectionDefinition,
                             pastVersionTimestamp,
+                            { optional: false }
                         )
                     },
                 )
@@ -74,11 +83,20 @@ export function mapCollectionVersions(options: {
             const latestVersionTimestamp = collectionVersionTimestamp(
                 latestCollectionDefinition,
             )
+            let mapped = mapCollectionVersion(
+                collectionName,
+                latestCollectionDefinition,
+                latestVersionTimestamp,
+                { optional: !history.length }
+            )
+            if (!mapped) {
+                mapped = {
+                    ...latestCollectionDefinition,
+                    version: new Date(minimalApplicationVersion)
+                }
+            }
             return {
-                ...mapCollectionVersion(
-                    latestCollectionDefinition,
-                    latestVersionTimestamp,
-                ),
+                ...mapped,
                 history,
             }
         },
