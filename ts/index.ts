@@ -1,30 +1,30 @@
 import StorageManager, { StorageRegistry, isChildOfRelationship, getChildOfRelationshipTarget } from '@worldbrain/storex'
 import { renderOperationArgs } from './operations';
-import { 
-    StorageModuleConstructorArgs, 
-    StorageModuleDebugConfig, 
-    StorageOperationExecuter, 
-    StorageModuleConfig, 
+import {
+    StorageModuleConstructorArgs,
+    StorageModuleDebugConfig,
+    StorageOperationExecuter,
+    StorageModuleConfig,
     StorageModuleHistory,
 } from './types';
 
 export * from './types'
 
 export interface StorageModuleInterface {
-    getConfig() : StorageModuleConfig
+    getConfig(): StorageModuleConfig
 }
 
 export abstract class StorageModule implements StorageModuleInterface {
     // private _storageManager : StorageManager
-    private _operationExecuter? : StorageOperationExecuter
-    private _config : StorageModuleConfig
-    debug : boolean | StorageModuleDebugConfig = false
+    private _operationExecuter?: StorageOperationExecuter
+    private _config: StorageModuleConfig
+    debug: boolean | StorageModuleDebugConfig = false
 
-    constructor({storageManager, operationExecuter} : StorageModuleConstructorArgs) {
+    constructor({ storageManager, operationExecuter }: StorageModuleConstructorArgs) {
         this._operationExecuter = operationExecuter || _defaultOperationExecutor(storageManager)
     }
 
-    abstract getConfig() : StorageModuleConfig
+    abstract getConfig(): StorageModuleConfig
 
     private _initConfig() {
         if (!this._config) {
@@ -42,20 +42,23 @@ export abstract class StorageModule implements StorageModuleInterface {
         this._initConfig()
         return this._config.operations
     }
-    
-    protected async operation(name : string, context : {[key : string] : any}, _method? : string) {
+
+    protected async operation(name: string, context: { [key: string]: any }, _method?: string) {
         if (this._operationExecuter) {
-            return this._operationExecuter({name, context, debug: this.debug, method: _method, render: () => {
-                return _renderOperation(this.operations[name], context)
-            }})
+            return this._operationExecuter({
+                name, context, debug: this.debug, method: _method, render: () => {
+                    const removeUndefinedValues = name === 'createObject'
+                    return _renderOperation(this.operations[name], context, { removeUndefinedValues })
+                }
+            })
         }
     }
 }
 
 export function registerModuleMapCollections(
-    collectionRegistry : StorageRegistry,
-    modules : {[name : string] : StorageModuleInterface},
-    options : {version? : Date} = {}
+    collectionRegistry: StorageRegistry,
+    modules: { [name: string]: StorageModuleInterface },
+    options: { version?: Date } = {}
 ) {
     for (const storageModule of Object.values(modules)) {
         registerModuleCollections(collectionRegistry, storageModule, options)
@@ -63,9 +66,9 @@ export function registerModuleMapCollections(
 }
 
 export function registerModuleCollections(
-    collectionRegistry : StorageRegistry,
-    storageModule : StorageModuleInterface,
-    options : {version? : Date} = {}
+    collectionRegistry: StorageRegistry,
+    storageModule: StorageModuleInterface,
+    options: { version?: Date } = {}
 ) {
     options.version = options.version || new Date()
 
@@ -79,8 +82,8 @@ export function registerModuleCollections(
     }
 }
 
-export function _defaultOperationExecutor(storageManager : StorageManager) {
-    return async ({name, render, debug} : {name : string, render : () => any, debug? : boolean | StorageModuleDebugConfig}) => {
+export function _defaultOperationExecutor(storageManager: StorageManager) {
+    return async ({ name, render, debug }: { name: string, render: () => any, debug?: boolean | StorageModuleDebugConfig }) => {
         const [operation, ...args] = render()
         if (debug) {
             _debugOperation('pre-op', name, operation, args, null, debug)
@@ -93,7 +96,7 @@ export function _defaultOperationExecutor(storageManager : StorageManager) {
     }
 }
 
-export function _debugOperation(stage : 'pre-op' | 'post-op', moduleOperation : string, backendOperation : string, args : any[], result : any | undefined, config : boolean | StorageModuleDebugConfig) {
+export function _debugOperation(stage: 'pre-op' | 'post-op', moduleOperation: string, backendOperation: string, args: any[], result: any | undefined, config: boolean | StorageModuleDebugConfig) {
     const print = (msg, operation, object) => {
         if ((config as StorageModuleDebugConfig).printDeepObjects) {
             object = require('util').inspect(object, false, null, true)
@@ -120,13 +123,13 @@ export function _debugOperation(stage : 'pre-op' | 'post-op', moduleOperation : 
     }
 }
 
-export function _renderOperation(operation : any, context : any) {
+export function _renderOperation(operation: any, context: any, options?: { removeUndefinedValues?: boolean }) {
     const args = [operation.operation]
     if (operation.collection) {
         args.push(operation.collection)
     }
 
-    const rendered = renderOperationArgs(operation.args, context)
+    const rendered = renderOperationArgs(operation.args, context, options)
     if (operation.args instanceof Array) {
         args.push(...rendered)
     } else {
@@ -135,7 +138,7 @@ export function _renderOperation(operation : any, context : any) {
     return args
 }
 
-export function _autoGenerateOperations(storageModule : StorageModule) {
+export function _autoGenerateOperations(storageModule: StorageModule) {
     for (const operationDefinition of Object.values(storageModule.operations)) {
         if (operationDefinition.operation === 'createObject') {
             if (operationDefinition['args']) {
@@ -161,7 +164,7 @@ export function _autoGenerateOperations(storageModule : StorageModule) {
     }
 }
 
-export function withHistory(moduleConfig : StorageModuleConfig & { history : StorageModuleHistory }) : StorageModuleConfig {
+export function withHistory(moduleConfig: StorageModuleConfig & { history: StorageModuleHistory }): StorageModuleConfig {
     for (const [collectionName, collectionHistory] of Object.entries(moduleConfig.history.collections)) {
         if (!moduleConfig.collections) {
             continue
