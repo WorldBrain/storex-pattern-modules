@@ -27,7 +27,7 @@
     "@types/events": "^1.2.0",
     "@types/mocha": "^2.2.44",
     "@types/node": "^10.12.11",
-    "@worldbrain/storex": "^0.3.5",
+    "@worldbrain/storex": "^0.4.1",
     "@worldbrain/storex-backend-dexie": "^0.2.3",
     "chai": "^4.1.2",
     "expect": "^23.5.0",
@@ -38,6 +38,6 @@
     "typescript": "^3.0.1"
   },
   "peerDependencies": {
-    "@worldbrain/storex": "^0.3.5"
+    "@worldbrain/storex": "^0.4.1"
   }
 }
