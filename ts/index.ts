@@ -73,8 +73,7 @@ export function registerModuleCollections(
     options.version = options.version || new Date()
 
     for (const [collectionName, collectionDefinition] of Object.entries(storageModule.getConfig().collections || {})) {
-        const history = collectionDefinition.history || []
-        history.push(collectionDefinition)
+        const history = [collectionDefinition, ...(collectionDefinition.history || [])]
         collectionRegistry.registerCollection(
             collectionName,
             history.filter(definition => definition.version.getTime() <= options.version.getTime()).map(definition => ({ ...definition }))
