@@ -47,7 +47,7 @@ export abstract class StorageModule implements StorageModuleInterface {
         if (this._operationExecuter) {
             return this._operationExecuter({
                 name, context, debug: this.debug, method: _method, render: () => {
-                    const removeUndefinedValues = name === 'createObject'
+                    const removeUndefinedValues = this.operations[name].operation === 'createObject'
                     return _renderOperation(this.operations[name], context, { removeUndefinedValues })
                 }
             })
