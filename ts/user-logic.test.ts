@@ -1,4 +1,4 @@
-import * as expect from 'expect'
+import expect from 'expect'
 import { UserLogic } from 'user-logic'
 import { typedValueTemplate } from './user-logic';
 

@@ -1,4 +1,4 @@
-import * as expect from 'expect'
+import expect from 'expect'
 import { FieldType } from '@worldbrain/storex/lib/types'
 import { StorageModule } from '.'
 import { installModuleSpy } from './spy';
