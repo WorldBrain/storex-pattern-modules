@@ -44,6 +44,9 @@ export abstract class StorageModule implements StorageModuleInterface {
     }
 
     protected async operation(name: string, context: { [key: string]: any }, _method?: string) {
+        if (!this.operations[name]) {
+            throw new Error(`Attempted to execute operation "${name}" which is not registered in the StorageModule's config`)
+        }
         if (this._operationExecuter) {
             return this._operationExecuter({
                 name, context, debug: this.debug, method: _method, render: () => {
