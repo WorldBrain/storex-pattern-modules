@@ -1,12 +1,16 @@
-import StorageManager, { StorageRegistry, isChildOfRelationship, getChildOfRelationshipTarget } from '@worldbrain/storex'
-import { renderOperationArgs } from './operations';
+import StorageManager, {
+    StorageRegistry,
+    isChildOfRelationship,
+    getChildOfRelationshipTarget,
+} from '@worldbrain/storex'
+import { renderOperationArgs } from './operations'
 import {
     StorageModuleConstructorArgs,
     StorageModuleDebugConfig,
     StorageOperationExecuter,
     StorageModuleConfig,
     StorageModuleHistory,
-} from './types';
+} from './types'
 
 export * from './types'
 
@@ -20,8 +24,12 @@ export abstract class StorageModule implements StorageModuleInterface {
     private _config: StorageModuleConfig
     debug: boolean | StorageModuleDebugConfig = false
 
-    constructor({ storageManager, operationExecuter }: StorageModuleConstructorArgs) {
-        this._operationExecuter = operationExecuter || _defaultOperationExecutor(storageManager)
+    constructor({
+        storageManager,
+        operationExecuter,
+    }: StorageModuleConstructorArgs) {
+        this._operationExecuter =
+            operationExecuter || _defaultOperationExecutor(storageManager)
     }
 
     abstract getConfig(): StorageModuleConfig
@@ -43,16 +51,29 @@ export abstract class StorageModule implements StorageModuleInterface {
         return this._config.operations
     }
 
-    protected async operation(name: string, context: { [key: string]: any }, _method?: string) {
+    protected async operation(
+        name: string,
+        context: { [key: string]: any },
+        _method?: string,
+    ) {
         if (!this.operations[name]) {
-            throw new Error(`Attempted to execute operation "${name}" which is not registered in the StorageModule's config`)
+            throw new Error(
+                `Attempted to execute operation "${name}" which is not registered in the StorageModule's config`,
+            )
         }
         if (this._operationExecuter) {
             return this._operationExecuter({
-                name, context, debug: this.debug, method: _method, render: () => {
-                    const removeUndefinedValues = this.operations[name].operation === 'createObject'
-                    return _renderOperation(this.operations[name], context, { removeUndefinedValues })
-                }
+                name,
+                context,
+                debug: this.debug,
+                method: _method,
+                render: () => {
+                    const removeUndefinedValues =
+                        this.operations[name].operation === 'createObject'
+                    return _renderOperation(this.operations[name], context, {
+                        removeUndefinedValues,
+                    })
+                },
             })
         }
     }
@@ -61,7 +82,7 @@ export abstract class StorageModule implements StorageModuleInterface {
 export function registerModuleMapCollections(
     collectionRegistry: StorageRegistry,
     modules: { [name: string]: StorageModuleInterface },
-    options: { version?: Date } = {}
+    options: { version?: Date } = {},
 ) {
     for (const storageModule of Object.values(modules)) {
         registerModuleCollections(collectionRegistry, storageModule, options)
@@ -71,21 +92,40 @@ export function registerModuleMapCollections(
 export function registerModuleCollections(
     collectionRegistry: StorageRegistry,
     storageModule: StorageModuleInterface,
-    options: { version?: Date } = {}
+    options: { version?: Date } = {},
 ) {
     options.version = options.version || new Date()
 
-    for (const [collectionName, collectionDefinition] of Object.entries(storageModule.getConfig().collections || {})) {
-        const history = [collectionDefinition, ...(collectionDefinition.history || [])]
+    for (const [collectionName, collectionDefinition] of Object.entries(
+        storageModule.getConfig().collections || {},
+    )) {
+        const history = [
+            collectionDefinition,
+            ...(collectionDefinition.history || []),
+        ]
         collectionRegistry.registerCollection(
             collectionName,
-            history.filter(definition => definition.version.getTime() <= options.version.getTime()).map(definition => ({ ...definition }))
+            history
+                .filter(
+                    (definition) =>
+                        definition.version.getTime() <=
+                        options.version.getTime(),
+                )
+                .map((definition) => ({ ...definition })),
         )
     }
 }
 
 export function _defaultOperationExecutor(storageManager: StorageManager) {
-    return async ({ name, render, debug }: { name: string, render: () => any, debug?: boolean | StorageModuleDebugConfig }) => {
+    return async ({
+        name,
+        render,
+        debug,
+    }: {
+        name: string
+        render: () => any
+        debug?: boolean | StorageModuleDebugConfig
+    }) => {
         const [operation, ...args] = render()
         if (debug) {
             _debugOperation('pre-op', name, operation, args, null, debug)
@@ -98,7 +138,14 @@ export function _defaultOperationExecutor(storageManager: StorageManager) {
     }
 }
 
-export function _debugOperation(stage: 'pre-op' | 'post-op', moduleOperation: string, backendOperation: string, args: any[], result: any | undefined, config: boolean | StorageModuleDebugConfig) {
+export function _debugOperation(
+    stage: 'pre-op' | 'post-op',
+    moduleOperation: string,
+    backendOperation: string,
+    args: any[],
+    result: any | undefined,
+    config: boolean | StorageModuleDebugConfig,
+) {
     const print = (msg, operation, object) => {
         if ((config as StorageModuleDebugConfig).printDeepObjects) {
             object = require('util').inspect(object, false, null, true)
@@ -107,9 +154,17 @@ export function _debugOperation(stage: 'pre-op' | 'post-op', moduleOperation: st
     }
     const show = () => {
         if (stage === 'pre-op') {
-            print('DEBUG - executing storage operation "%s" with args', backendOperation, args)
+            print(
+                'DEBUG - executing storage operation "%s" with args',
+                backendOperation,
+                args,
+            )
         } else {
-            print('DEBUG - storage backend operation "%s" returned', backendOperation, result)
+            print(
+                'DEBUG - storage backend operation "%s" returned',
+                backendOperation,
+                result,
+            )
         }
     }
 
@@ -118,14 +173,18 @@ export function _debugOperation(stage: 'pre-op' | 'post-op', moduleOperation: st
         return
     }
 
-    const maybeDebugConfig = (config as StorageModuleDebugConfig)
+    const maybeDebugConfig = config as StorageModuleDebugConfig
     const onlyOperations = maybeDebugConfig.onlyModuleOperations
     if (!onlyOperations || onlyOperations.indexOf(moduleOperation) >= 0) {
         show()
     }
 }
 
-export function _renderOperation(operation: any, context: any, options?: { removeUndefinedValues?: boolean }) {
+export function _renderOperation(
+    operation: any,
+    context: any,
+    options?: { removeUndefinedValues?: boolean },
+) {
     const args = [operation.operation]
     if (operation.collection) {
         args.push(operation.collection)
@@ -147,18 +206,24 @@ export function _autoGenerateOperations(storageModule: StorageModule) {
                 continue
             }
 
-            let collectionDefinition = storageModule.collections[operationDefinition.collection]
+            let collectionDefinition =
+                storageModule.collections[operationDefinition.collection]
             if (collectionDefinition instanceof Array) {
                 collectionDefinition = collectionDefinition.slice(-1)[0]
             }
 
-            const args = operationDefinition['args'] = {}
-            for (const [fieldName, fieldDefinition] of Object.entries(collectionDefinition.fields)) {
+            const args = (operationDefinition['args'] = {})
+            for (const [fieldName, fieldDefinition] of Object.entries(
+                collectionDefinition.fields,
+            )) {
                 args[fieldName] = `$${fieldName}:${fieldDefinition.type}`
             }
-            for (const relationship of collectionDefinition.relationships || []) {
+            for (const relationship of collectionDefinition.relationships ||
+                []) {
                 if (isChildOfRelationship(relationship)) {
-                    const alias = relationship.alias || getChildOfRelationshipTarget(relationship)
+                    const alias =
+                        relationship.alias ||
+                        getChildOfRelationshipTarget(relationship)
                     args[alias] = `$${alias}`
                 }
             }
@@ -166,8 +231,12 @@ export function _autoGenerateOperations(storageModule: StorageModule) {
     }
 }
 
-export function withHistory(moduleConfig: StorageModuleConfig & { history: StorageModuleHistory }): StorageModuleConfig {
-    for (const [collectionName, collectionHistory] of Object.entries(moduleConfig.history.collections)) {
+export function withHistory(
+    moduleConfig: StorageModuleConfig & { history: StorageModuleHistory },
+): StorageModuleConfig {
+    for (const [collectionName, collectionHistory] of Object.entries(
+        moduleConfig.history.collections,
+    )) {
         if (!moduleConfig.collections) {
             continue
         }
