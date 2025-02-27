@@ -69,6 +69,11 @@
   resolved "https://registry.yarnpkg.com/@types/events/-/events-1.2.0.tgz#81a6731ce4df43619e5c8c945383b3e62a89ea86"
   integrity sha512-KEIlhXnIutzKwRbQkGWb/I4HFqBuUykAdHgDED6xqwXJfONCjF5VoE0cXEiurh3XauygxzeDzgtXUqvLkxFzzA==
 
+"@types/lodash@^4.14.108":
+  version "4.17.15"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.17.15.tgz#12d4af0ed17cc7600ce1f9980cec48fc17ad1e89"
+  integrity sha512-w/P33JFeySuhN6JLkysYUK2gEmy9kHHFN7E8ro0tkfmlDOgxBDzWEZ/J8cWA+fHqFevpswDTFZnDx+R9lbL6xw==
+
 "@types/mocha@^2.2.44":
   version "2.2.48"
   resolved "https://registry.yarnpkg.com/@types/mocha/-/mocha-2.2.48.tgz#3523b126a0b049482e1c3c11877460f76622ffab"
@@ -861,10 +866,10 @@ type-detect@4.0.8, type-detect@^4.0.0, type-detect@^4.0.5:
   resolved "https://registry.yarnpkg.com/type-detect/-/type-detect-4.0.8.tgz#7646fb5f18871cfbb7749e69bd39a6388eb7450c"
   integrity sha512-0fr/mIH1dlO+x7TlcMy+bIDqKPsw/70tVyeHW787goQjhmqaZe10uwLujubK9q9Lg6Fiho1KUKDYz0Z7k7g5/g==
 
-typescript@^3.0.1:
-  version "3.9.7"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.9.7.tgz#98d600a5ebdc38f40cb277522f12dc800e9e25fa"
-  integrity sha512-BLbiRkiBzAwsjut4x/dsibSTB6yWpwT5qWmC2OfuCg3GgVQCSgMs4vEctYPhsaGtd0AeuuHMkjZ2h2WG8MSzRw==
+typescript@^5.1.0:
+  version "5.7.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.7.3.tgz#919b44a7dbb8583a9b856d162be24a54bf80073e"
+  integrity sha512-84MVSjMEHP+FQRPy3pX9sTVV/INIex71s9TL2Gm5FG/WG1SqXeKyZ0k7/blY/4FdOzI12CBy1vGc4og/eus0fw==
 
 typeson-registry@^1.0.0-alpha.20:
   version "1.0.0-alpha.38"
