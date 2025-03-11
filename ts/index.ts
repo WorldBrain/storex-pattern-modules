@@ -11,6 +11,7 @@ import {
     StorageModuleConfig,
     StorageModuleHistory,
 } from './types'
+import inspect from 'util'
 
 export * from './types'
 
@@ -148,7 +149,7 @@ export function _debugOperation(
 ) {
     const print = (msg, operation, object) => {
         if ((config as StorageModuleDebugConfig).printDeepObjects) {
-            object = require('util').inspect(object, false, null, true)
+            object = inspect(object, false, null, true)
         }
         console.debug(msg, operation, object)
     }
